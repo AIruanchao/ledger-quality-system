@@ -1,0 +1,17 @@
+[Unit]
+Description=台账系统质量保障API
+After=network.target
+
+[Service]
+Type=simple
+User=maccc
+WorkingDirectory=/Users/maccc/Projects/ledger-quality-system
+EnvironmentFile=/Users/maccc/.config/tz-cli/secrets.env
+ExecStart=/Users/maccc/Projects/ledger-quality-system/.venv311/bin/uvicorn src.api:app --host 0.0.0.0 --port 8200
+Restart=always
+RestartSec=5
+StandardOutput=/Users/maccc/Projects/ledger-quality-system/logs/ledger-api.log
+StandardError=/Users/maccc/Projects/ledger-quality-system/logs/ledger-api-error.log
+
+[Install]
+WantedBy=multi-user.target
