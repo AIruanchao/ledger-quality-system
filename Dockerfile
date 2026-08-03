@@ -19,6 +19,10 @@ COPY src/ ./src/
 COPY tests/ ./tests/
 COPY scripts/ ./scripts/
 
+# 非root用户运行
+RUN useradd -r -s /bin/false appuser && chown -R appuser:appuser /app
+USER appuser
+
 # 环境变量默认值（密钥运行时通过--env-file注入，不在镜像中硬编码）
 ENV TZ_ERP_URL=https://erp.nenie.vip \
     TZ_HT_URL=https://ht.nenie.vip \
