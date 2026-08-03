@@ -32,16 +32,18 @@ line-length = 120
 select = ["E", "F", "W", "I", "UP", "B", "S", "T20"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["S101", "S310", "S603", "S607", "T20", "F841", "B007"]
+"tests/*" = ["S101", "S105", "S310", "S603", "S607", "T20", "F841", "B007"]
 "scripts/*" = ["T20", "S603", "S607"]
 "src/config.py" = ["T201"]
 "src/feishu_client.py" = ["S310"]
+"src/monitors/__init__.py" = ["S310", "S603", "S607"]
+"src/monitors/alert.py" = ["S310", "T201"]
 "src/tz_cli.py" = ["S310", "B007"]
 "src/validators/schema.py" = ["UP042", "UP045", "UP037"]
 
 [tool.coverage.run]
 source = ["src"]
-omit = ["tests/*", "scripts/*", "src/config.py", "src/feishu_client.py", "src/tz_cli.py"]
+omit = ["tests/*", "scripts/*", "src/tz_cli.py", "src/monitors/*"]
 
 [tool.coverage.report]
 fail_under = 80
