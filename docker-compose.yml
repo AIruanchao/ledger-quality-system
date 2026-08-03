@@ -1,0 +1,24 @@
+services:
+  ledger:
+    build: .
+    container_name: ledger-quality-system
+    environment:
+      - TZ_FEISHU_BASE=${TZ_FEISHU_BASE}
+      - TZ_FEISHU_APP_ID=${TZ_FEISHU_APP_ID}
+      - TZ_FEISHU_SECRET=${TZ_FEISHU_SECRET}
+      - TZ_ERP_URL=${TZ_ERP_URL:-https://erp.nenie.vip}
+      - TZ_HT_URL=${TZ_HT_URL:-https://ht.nenie.vip}
+    volumes:
+      - ./data:/app/data
+      - ./backups:/backups
+    restart: unless-stopped
+
+  test:
+    build: .
+    container_name: ledger-test
+    command: pytest tests/unit/ tests/e2e/ -v --tb=short --cov=src --cov-fail-under=80
+    profiles: ["test"]
+    environment:
+      - TZ_FEISHU_BASE=${TZ_FEISHU_BASE}
+      - TZ_FEISHU_APP_ID=${TZ_FEISHU_APP_ID}
+      - TZ_FEISHU_SECRET=${TZ_FEISHU_SECRET}

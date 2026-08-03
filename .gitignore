@@ -27,6 +27,9 @@ htmlcov/
 
 # Secrets — 永远不提交
 .env
+.env.dev
+.env.staging
+.env.prod
 *.secret
 secrets.env
 
