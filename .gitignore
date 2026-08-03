@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual env
+.venv*/
+venv/
+env/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Secrets — 永远不提交
+.env
+*.secret
+secrets.env
+
+# OS
+.DS_Store
+Thumbs.db
