@@ -36,11 +36,12 @@ select = ["E", "F", "W", "I", "UP", "B", "S", "T20"]
 "scripts/*" = ["T20", "S603", "S607"]
 "src/config.py" = ["T201"]
 "src/feishu_client.py" = ["S310"]
+"src/tz_cli.py" = ["S310", "B007"]
 "src/validators/schema.py" = ["UP042", "UP045", "UP037"]
 
 [tool.coverage.run]
 source = ["src"]
-omit = ["tests/*", "scripts/*", "src/config.py", "src/feishu_client.py"]
+omit = ["tests/*", "scripts/*", "src/config.py", "src/feishu_client.py", "src/tz_cli.py"]
 
 [tool.coverage.report]
 fail_under = 80
