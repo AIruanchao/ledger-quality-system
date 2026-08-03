@@ -1,0 +1,12 @@
+# CODEOWNERS — 每个PR自动指定审阅人
+# 仓库根目录
+*           @AIruanchao
+
+# 源代码
+/src/       @AIruanchao
+
+# CI/CD配置
+/.github/   @AIruanchao
+
+# 测试
+/tests/     @AIruanchao
