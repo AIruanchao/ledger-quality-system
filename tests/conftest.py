@@ -11,14 +11,20 @@ from pathlib import Path
 # 确保 src 在 import path 中
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-# CI环境注入mock密钥（防止config.py import时sys.exit(78)）
-_MOCK_SECRETS = {
-    "TZ_FEISHU_BASE": "test_base_for_ci",
-    "TZ_FEISHU_APP_ID": "test_app_id_for_ci",
-    "TZ_FEISHU_SECRET": "test_secret_for_ci",
-}
-for k, v in _MOCK_SECRETS.items():
-    os.environ.setdefault(k, v)
+# 先尝试加载真实 secrets.env（本机有真实密钥）
+_secrets_file = Path.home() / ".config" / "tz-cli" / "secrets.env"
+if _secrets_file.exists():
+    for line in _secrets_file.read_text().splitlines():
+        line = line.strip()
+        if line and not line.startswith("#") and "=" in line:
+            k, _, v = line.partition("=")
+            os.environ.setdefault(k.strip(), v.strip())
+
+# CI 环境注入 mock 密钥（仅当真实密钥仍缺失时）
+if not os.environ.get("TZ_FEISHU_APP_ID"):
+    os.environ.setdefault("TZ_FEISHU_BASE", "test_base_for_ci")
+    os.environ.setdefault("TZ_FEISHU_APP_ID", "test_app_id_for_ci")
+    os.environ.setdefault("TZ_FEISHU_SECRET", "test_secret_for_ci")
 
 import pytest  # noqa: E402
 
@@ -44,13 +50,10 @@ def sample_contract_records():
 def sample_bad_records():
     """包含各种PIT-TZ问题的脏数据（用于unit test验证检测能力）。"""
     return [
-        # PIT-TZ-002: 配置串入
         {"合同编号": "BAD-001", "产品型号": "12+256", "对方公司": "某公司",
          "合同金额": "10000", "合同状态": "✅ 已批准", "台数": "5", "单价": "2000"},
-        # PIT-TZ-004: 金额≠单价×台数
         {"合同编号": "BAD-002", "合同金额": "99999", "单价": "100", "台数": "10",
          "合同状态": "✅ 已批准", "对方公司": "某公司", "产品型号": "正常型号"},
-        # PIT-TZ-001: 日期是时间戳
         {"合同编号": "BAD-003", "到期日期": "1778601600000",
          "合同金额": "100", "合同状态": "✅ 已批准", "对方公司": "某公司"},
     ]
