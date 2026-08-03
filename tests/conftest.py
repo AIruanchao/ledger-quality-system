@@ -4,14 +4,23 @@ pytest 全局配置和 fixture。
 - integration 测试：需要飞书API
 - E2E测试：需要飞书+HT+ERP
 """
+import os
 import sys
 from pathlib import Path
-
-import pytest
 
 # 确保 src 在 import path 中
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+# CI环境注入mock密钥（防止config.py import时sys.exit(78)）
+_MOCK_SECRETS = {
+    "TZ_FEISHU_BASE": "test_base_for_ci",
+    "TZ_FEISHU_APP_ID": "test_app_id_for_ci",
+    "TZ_FEISHU_SECRET": "test_secret_for_ci",
+}
+for k, v in _MOCK_SECRETS.items():
+    os.environ.setdefault(k, v)
+
+import pytest  # noqa: E402
 
 # ==================== Unit Test Fixtures ====================
 
@@ -52,11 +61,8 @@ def sample_bad_records():
 @pytest.fixture(scope="session")
 def feishu_client():
     """飞书客户端实例（session级别共享token）。"""
-    try:
-        from src.feishu_client import FeishuClient
-        return FeishuClient()
-    except SystemExit:
-        pytest.skip("飞书密钥未配置，跳过集成测试")
+    from src.feishu_client import FeishuClient
+    return FeishuClient()
 
 
 @pytest.fixture(scope="session")
