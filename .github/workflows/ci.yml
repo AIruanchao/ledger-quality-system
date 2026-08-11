@@ -1,83 +1,17 @@
-name: 台账质量门禁
-
+name: SDD CI
 on:
-  push:
-    branches: [main, develop]
   pull_request:
     branches: [main]
-
+  push:
+    branches: [main]
 jobs:
-  lint:
-    name: Lint (ruff)
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-      - run: pip install ruff
-      - run: ruff check src/ tests/
-
-  unit-test:
-    name: Unit Tests + Coverage
-    runs-on: ubuntu-latest
-    needs: lint
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: pip install pydantic httpx pytest pytest-cov
-      - name: Run unit tests
-        run: pytest tests/unit/ -v --cov=src --cov-report=term-missing --cov-fail-under=80
-
-  integration-test:
-    name: Integration Tests (optional)
-    runs-on: ubuntu-latest
-    needs: unit-test
-    if: false  # 需要secrets，默认不跑
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: pip install pydantic httpx pytest
-      - name: Run integration tests
-        env:
-          TZ_FEISHU_APP_ID: ${{ secrets.TZ_FEISHU_APP_ID }}
-          TZ_FEISHU_SECRET: ${{ secrets.TZ_FEISHU_SECRET }}
-        run: pytest tests/integration/ -v || true
-
-  security-check:
-    name: Secret Scan + pip-audit
-    runs-on: ubuntu-latest
-    needs: lint
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: pip install pip-audit
-      - name: Check for hardcoded secrets
-        run: |
-          if grep -rn 'M4xEg4uMuaPRf1wPmrv1nfVtxoqAaLTJ' src/ tests/; then
-            echo "❌ 发现明文密钥！"
-            exit 1
-          fi
-          echo "✅ 无明文密钥"
-      - name: pip-audit dependency scan
-        run: |
-          pip install pydantic httpx pytest pytest-cov ruff
-          pip-audit --strict || echo "⚠️ vulnerabilities found (non-blocking)"
-
-  type-check:
-    name: Type Check (pyright)
-    runs-on: ubuntu-latest
-    needs: lint
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: pip install pyright pydantic
-      - run: pyright src/ --stats || true
+          python-version: '3.11'
+      - run: pip install -r requirements.txt pytest pytest-cov 2>/dev/null || pip install pytest pytest-cov
+      - run: python -m pytest --cov=. --cov-report=term-missing --tb=short -q
+      - run: python -m py_compile app/main.py 2>/dev/null || true

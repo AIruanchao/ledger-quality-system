@@ -2,6 +2,8 @@
 sentry.py 单元测试。
 """
 
+import sys
+
 from src.sentry import capture_exception, init_sentry
 
 
@@ -16,7 +18,9 @@ class TestSentryInit:
     def test_init_with_dsn_but_no_sdk(self, monkeypatch):
         """有DSN但sentry-sdk未安装 → 返回False。"""
         monkeypatch.setenv("SENTRY_DSN", "https://fake@sentry.io/1")
-        # sentry-sdk没装，应该返回False
+        # 模拟sentry-sdk未安装：sys.modules中置None使import引发ImportError
+        monkeypatch.setitem(sys.modules, "sentry_sdk", None)
+        monkeypatch.setitem(sys.modules, "sentry_sdk.integrations.logging", None)
         result = init_sentry()
         assert result is False
 
